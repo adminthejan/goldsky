@@ -1,0 +1,208 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------- *
+ * Design tokens — GoldSky light theme (forced, no dark-mode variant).
+ * White/off-white ground, near-black ink, one gold accent. These become
+ * real Tailwind utilities (bg-bone, text-ink, font-display…) via Tailwind
+ * v4's CSS-first @theme config — no tailwind.config.js needed.
+ * ---------------------------------------------------------------------- */
+@theme {
+  /* Surfaces */
+  --color-bone: #ffffff;
+  --color-bone-soft: #fafaf9;
+  --color-paper: #ffffff;
+
+  /* Ink (text) */
+  --color-ink: #111111;
+  --color-ink-soft: #4b5563;
+  --color-ink-faint: #9ca3af;
+  --color-ink-inverse: #ffffff;
+
+  /* Hairlines */
+  --color-line: #e7e5e4;
+  --color-line-soft: #f0eeec;
+
+  /* Accent — amber/gold, used for prices, active states, badges */
+  --color-gold: #b8860b;
+  --color-gold-deep: #96700a;
+  --color-gold-soft: #f5e9cc;
+
+  /* WhatsApp — present but quiet */
+  --color-whatsapp: #25d366;
+  --color-whatsapp-deep: #1da851;
+
+  /* Type — next/font self-hosts both and exposes them as CSS vars on
+     <html> (see layout.tsx); we just point Tailwind's font tokens at them. */
+  --font-display: var(--font-display-raw), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-sans-raw), ui-sans-serif, system-ui, sans-serif;
+
+  /* Radius */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+
+  /* Motion */
+  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --animate-soft-bounce: soft-bounce 2.2s var(--ease-out-soft) infinite;
+  --animate-fade-up: fade-up 0.7s var(--ease-out-soft) forwards;
+  --animate-shimmer: shimmer 1.8s ease-in-out infinite;
+}
+
+@keyframes soft-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(7px);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes marquee-scroll {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Theme is intentionally forced to light — no @media (prefers-color-scheme:
+   dark) variant. GoldSky is a light-only brand system; letting the OS/
+   browser color scheme flip these tokens was the root cause of the site
+   rendering black for users on a dark system theme, since nothing in the
+   app ever opted into or out of it. If a real dark mode is wanted later,
+   gate it behind an explicit toggle (e.g. a `[data-theme="dark"]` class
+   set by user action), not an automatic system-preference media query. */
+
+/* Base element resets live in @layer base so component/utility classes
+   (which Tailwind also emits into cascade layers) can still override
+   them — plain unlayered rules would otherwise always win regardless
+   of source order and silently defeat things like .btn-primary's text
+   color. */
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    background: var(--color-bone);
+    color: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  a {
+    color: inherit;
+  }
+
+  ::selection {
+    background: var(--color-gold-soft);
+    color: var(--color-ink);
+  }
+}
+
+/* Deliberately unlayered: this must beat Tailwind's utility layer (the
+   .whatsapp-fab element also carries the `flex` utility), and utilities
+   always win over anything in @layer base/components regardless of
+   selector specificity or source order. The PDP's mobile sticky order
+   bar already surfaces a WhatsApp CTA, so hide the redundant global
+   floating button when that bar is present, to avoid the two colliding
+   at the bottom of small screens. */
+@media (max-width: 639px) {
+  body:has([data-pdp-sticky-bar]) .whatsapp-fab,
+  body:has([data-pdp-sticky-bar]) .scroll-to-top-fab {
+    display: none;
+  }
+}
+
+/* ---------------------------------------------------------------------- *
+ * Reusable component classes — one consistent button/label system so
+ * every page (products, PDP, services, about…) draws from the same set
+ * instead of one-off utility strings.
+ * ---------------------------------------------------------------------- */
+@layer components {
+  .eyebrow {
+    @apply text-[11px] font-medium uppercase tracking-[0.18em] text-ink-faint;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-sm px-7 py-3.5 text-[14px] font-medium transition-all duration-300 ease-out bg-ink text-ink-inverse hover:bg-ink/85;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-sm px-7 py-3.5 text-[14px] font-medium transition-all duration-300 ease-out border border-ink/25 text-ink hover:border-ink hover:bg-ink hover:text-ink-inverse;
+  }
+  .btn-whatsapp {
+    @apply inline-flex items-center gap-2 rounded-pill border border-whatsapp/30 bg-whatsapp/10 px-4 py-2 text-[13px] font-medium text-whatsapp-deep transition-colors duration-300 hover:bg-whatsapp/15;
+  }
+
+  .link-underline {
+    @apply relative;
+  }
+  .link-underline::after {
+    content: "";
+    @apply absolute left-0 -bottom-0.5 h-px w-full origin-left scale-x-0 bg-current transition-transform duration-300 ease-out;
+  }
+  .link-underline:hover::after {
+    @apply scale-x-100;
+  }
+
+  /* Skeleton shimmer — stand-in for real photography across product
+     cards, PDP galleries and map embeds. Soft off-white sweep instead of
+     the old gray diagonal-stripe placeholder box. */
+  .skeleton {
+    background-image: linear-gradient(
+      100deg,
+      var(--color-bone-soft) 30%,
+      var(--color-line-soft) 50%,
+      var(--color-bone-soft) 70%
+    );
+    background-size: 300% 100%;
+    animation: var(--animate-shimmer);
+  }
+
+  /* Brand marquee — the track's content is two copies of the same row
+     back to back (see BrandMarquee.tsx), so a translateX to exactly -50%
+     hands off from the first copy to the second with no visible seam,
+     looping forever. Duration is set per-row via --marquee-duration so
+     rows can drift at slightly different speeds instead of looking
+     mechanically synced. */
+  .marquee-track {
+    animation: marquee-scroll var(--marquee-duration, 32s) linear infinite;
+  }
+  .marquee-track:hover {
+    animation-play-state: paused;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
+}
