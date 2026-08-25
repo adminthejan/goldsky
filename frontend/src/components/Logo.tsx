@@ -1,33 +1,27 @@
 /**
- * GoldSky's mark: a minimal IC/chip-package silhouette — the shop's
- * actual craft is chip-level micro-soldering, so the mark is drawn from
- * the thing on the bench, not a generic phone outline. The single gold
- * dot is the "pin-1" indicator real IC packages use to mark their first
- * lead/orientation corner — repurposed here as the one spot of brand
- * color, echoing the gold accent used for prices and active states
- * everywhere else on the site. Same thin-outline-on-transparent language
- * as the homepage's circle/square/diamond feature icons, just precise
- * enough to read as a specific object instead of an abstract shape.
+ * GoldSky's mark: an open-ring "G" monogram — the ring (whole, unbroken
+ * but for one gap) reads as "Sky" — open, horizon-like — while the gap
+ * plus inward bar reads as the initial "G". The bar terminates in a
+ * single gold dot: a sunset/sunrise point on the horizon, and the one
+ * spot of brand color, echoing the gold accent used for prices and
+ * active states everywhere else on the site.
  *
- * Pure SVG primitives (rect/line/circle), not a freehand path — every
- * coordinate is intentional and the whole mark is symmetric, so it holds
- * up from a 16px favicon to a large print/print-like use.
+ * Pure SVG primitives (arc/line/circle) with every coordinate computed
+ * from the ring's actual geometry (radius 10, centered at 16,16, gap
+ * spanning -25°..25°) rather than freehand-drawn, so it stays exact and
+ * legible from a 16px favicon up.
  */
-const PIN_POSITIONS = [11, 16, 21] as const;
-
 export function LogoMark({ className = "h-6 w-6" }: { className?: string }) {
   return (
     <svg viewBox="0 0 32 32" fill="none" aria-hidden="true" className={className}>
-      <rect x="7" y="7" width="18" height="18" rx="5" stroke="currentColor" strokeWidth="2" />
-      {PIN_POSITIONS.map((pos) => (
-        <g key={pos} stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-          <line x1={pos} y1="7" x2={pos} y2="3" />
-          <line x1={pos} y1="25" x2={pos} y2="29" />
-          <line x1="7" y1={pos} x2="3" y2={pos} />
-          <line x1="25" y1={pos} x2="29" y2={pos} />
-        </g>
-      ))}
-      <circle cx="12" cy="12" r="2.3" fill="var(--color-gold)" />
+      <path
+        d="M 25.06 20.23 A 10 10 0 1 1 25.06 11.77"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+      />
+      <line x1="26" y1="16" x2="18" y2="16" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+      <circle cx="18" cy="16" r="2" fill="var(--color-gold)" />
     </svg>
   );
 }
