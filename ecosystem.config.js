@@ -2,8 +2,8 @@ module.exports = {
   apps: [
     {
       name: "goldsky-frontend",
-      cwd: "/var/www/goldsky/frontend",
-      script: "node_modules/next/dist/bin/next",
+      cwd: __dirname + "/frontend",
+      script: "node_modules/.bin/next",
       args: "start -p 3002",
       env: {
         NODE_ENV: "production",
