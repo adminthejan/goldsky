@@ -65,6 +65,12 @@ frontend/next-env.d.ts
 /backend/public/storage
 /backend/public/build
 
+### Stray root-level artifacts (pre-restructure) ###
+
+/.next/
+/node_modules/
+/next-env.d.ts
+
 ### Misc ###
 
 .DS_Store
